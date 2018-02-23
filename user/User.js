@@ -1,9 +1,19 @@
-var mongoose = require('mongoose');  
-var UserSchema = new mongoose.Schema({  
-  name: String,
-  email: String,
-  password: String
-});
-mongoose.model('User', UserSchema);
+const pool = require("../db");
 
-module.exports = mongoose.model('User');
+module.exports = function(req, res) {
+  pool.getConnection((err, connection) => {
+    if (err) {
+      res.json({ code: 100, status: "Error in connection database" });
+    }
+    console.log(req);
+    connection.query(`SELECT * FROM user`, err => {
+      console.log(res);
+      connection.release();
+      if (err) {
+        res.json({ code: 100, status: "Query failed in DB" });
+      } else {
+        res.json({ code: 200, status: "Success" });
+      }
+    });
+  });
+};
